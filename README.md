@@ -1,7 +1,10 @@
 shoebill
 ========
+![Logo](docs/shoebill.png?raw=true)
 
 Web-based editor for Pelican and Nikola
+
+
 
 Installation
 ------------
@@ -34,3 +37,6 @@ Optionally you can specify:
     -D                             - Bottle debugging mode
     -t <target>, --target <target> - Additional make target to be executed from the UI
     --no-auth                      - Disable authentication
+
+
+
