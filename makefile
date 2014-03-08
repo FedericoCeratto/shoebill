@@ -50,11 +50,11 @@ cover-html:
 	nosetests --with-coverage --cover-package $(PROJ)  --cover-html
 
 cover-basic-loop:
-	while true;do inotifywait */*.py;nosetests tests/test_basic.py --with-coverage --cover-package=shoebill --cover-erase;sleep 1;done
+	while true;do inotifywait */*.py;nosetests tests/test_basic.py --with-coverage --cover-package=$(PROJ) --cover-erase;sleep 1;done
 
 cover-functional-loop:
-	while true;do inotifywait */*.py;nosetests tests/test_functional.py --with-coverage --cover-package=shoebill --cover-erase;sleep 1;done
+	while true;do inotifywait */*.py;nosetests tests/test_functional.py --with-coverage --cover-package=$(PROJ) --cover-erase;sleep 1;done
 
 cover-loop:
-	while true;do inotifywait */*.py;nosetests tests/test*.py --with-coverage --cover-package=shoebill --cover-erase;sleep 1;done
+	while true;do inotifywait */*.py;nosetests tests/test*.py --with-coverage --cover-package=$(PROJ) --cover-erase;sleep 1;done
 
