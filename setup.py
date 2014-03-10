@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+from glob import glob
 from setuptools import setup
+import os.path
 
 __version__ = '0.1'
 
@@ -14,12 +16,25 @@ Programming Language :: Python :: 2.7
 Topic :: Internet :: WWW/HTTP :: WSGI
 """.splitlines())
 
+data_files_globs = [
+    ['views', ['*.tpl']],
+]
+
+
+data_files = []
+for dirname, globs in data_files_globs:
+    expanded_fnames = set()
+    for g in globs:
+        ffn = os.path.join(dirname, g)
+        expanded_fnames.update(glob(ffn))
+
+    data_files.append((dirname, sorted(expanded_fnames)))
+
 entry_points = {
     'console_scripts': [
         'shoebill = shoebill:main',
     ]
 }
-
 
 setup(
     name="shoebill",
@@ -35,18 +50,12 @@ setup(
     install_requires=[
         'Beaker>=1.6.3',
         'Bottle>=0.10.11',
-        'GitPython>=0.3.1',
+        'GitPython>=0.1.7',
         'bottle-cork',
         'setproctitle>=1.0.1',
     ],
     packages=['shoebill'],
-    data_files=[
-        ('views', [
-            'views/admin_page.tpl',
-            'views/edit.tpl',
-            'views/login_form.tpl',
-            'views/msgbox.tpl']),
-    ],
+    data_files=data_files,
     platforms=['Linux'],
     test_suite='nose.collector',
     tests_require=['nose'],
