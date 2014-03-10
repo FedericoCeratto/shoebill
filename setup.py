@@ -41,8 +41,11 @@ setup(
     ],
     packages=['shoebill'],
     data_files=[
-        ('views',
-            ['admin_page.tpl','edit.tpl', 'login_form.tpl', 'msgbox.tpl'])
+        ('views', [
+            'views/admin_page.tpl',
+            'views/edit.tpl',
+            'views/login_form.tpl',
+            'views/msgbox.tpl']),
     ],
     platforms=['Linux'],
     test_suite='nose.collector',
