@@ -39,7 +39,7 @@ setup(
         'bottle-cork',
         'setproctitle>=1.0.1',
     ],
-    modules=['shoebill'],
+    packages=['shoebill'],
     platforms=['Linux'],
     test_suite='nose.collector',
     tests_require=['nose'],
