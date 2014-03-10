@@ -40,6 +40,10 @@ setup(
         'setproctitle>=1.0.1',
     ],
     packages=['shoebill'],
+    data_files=[
+        ('views',
+            ['admin_page.tpl','edit.tpl', 'login_form.tpl', 'msgbox.tpl'])
+    ]
     platforms=['Linux'],
     test_suite='nose.collector',
     tests_require=['nose'],
