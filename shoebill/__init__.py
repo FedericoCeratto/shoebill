@@ -238,6 +238,25 @@ def logout():
 
     return bottle.redirect('/edit')
 
+@bottle.route('/change_password')
+@bottle.view('password_change_form')
+def route_password_change_form():
+    """Serve password change form"""
+    if not aaa:
+        return bottle.redirect('/edit')
+
+@bottle.post('/change_password')
+def route_change_password():
+    """Change password"""
+    if not aaa:
+        return bottle.redirect('/edit')
+
+    aaa.require(fail_redirect='/login')
+    password = post_get('password')
+    aaa.current_user.update(pwd=password)
+
+    return msg('Password updated.')
+
 @bottle.route('/edit')
 @bottle.route('/edit/')
 @bottle.route('/edit/<path:path>')
@@ -274,8 +293,11 @@ def route_edit(path='', savemsg=None):
         with open(path.as_abs_path) as f:
             contents = f.read()
 
-    return dict(path=path, contents=contents, savemsg=savemsg,
-        git_enabled=bool(git_repo), make_targets=make_targets)
+    d = dict(path=path, contents=contents, savemsg=savemsg,
+        git_enabled=bool(git_repo), make_targets=make_targets,
+        aaa_enabled=bool(aaa),
+    )
+    return d
 
 
 @bottle.post('/edit/<path:path>')

@@ -119,8 +119,13 @@
                 -moz-box-shadow:    inset 0 -10px 10px #999;
                 -webkit-box-shadow: inset 0 -10px 10px #999;
                 box-shadow:         inset 0 -10px 10px #999;
-             }
-
+            }
+            div#pwchange {
+                bottom: .7em;
+                margin-left: 3em;
+                position: absolute;
+            }
+            div#pwchange a { color: #ffe; }
         </style>
 
 
@@ -149,6 +154,11 @@
             <form action="/logout" method="GET">
                 <input type="submit" class="button" value="Logout">
             </form>
+            % if aaa_enabled:
+            <div id="pwchange">
+                <a href="change_password">Change password</a>
+            </div>
+            % end
         </div>
 
         <div id="fsbox" class="centercol">
