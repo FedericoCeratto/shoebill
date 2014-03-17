@@ -369,7 +369,6 @@ def route_run_make_target(target):
 
 @bottle.route('/favicon.ico')
 def serve_favicon():
-    print 'ou'
     return bottle.static_file('favicon.ico', root='static/')
 
 # Admin-only pages
