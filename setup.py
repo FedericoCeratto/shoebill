@@ -18,6 +18,7 @@ Topic :: Internet :: WWW/HTTP :: WSGI
 
 data_files_globs = [
     ['views', ['*.tpl']],
+    ['static', ['*.ico']],
 ]
 
 

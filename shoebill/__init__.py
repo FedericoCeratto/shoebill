@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Web-based editor for Pelican websites
+# Web-based editor for Pelican and Nikola websites
 #
 # Copyright (C) 2014 Federico Ceratto
 #
@@ -55,15 +55,15 @@ content_path = None
 make_targets = None
 
 class Path(object):
-    """Represent a path to a file or directory in the Pelican site dir
+    """Represent a path to a file or directory in the site dir
     """
     def __init__(self, relurl=None, absfile=None):
         global content_path
         self._content_path = content_path
         self._ossep = os.sep
         self._urlsep = '/'
-        print "relurl %r" % relurl
-        print "absfile %r" % absfile
+        #print "relurl %r" % relurl
+        #print "absfile %r" % absfile
 
         if absfile:
             self._abspath = absfile
@@ -367,6 +367,10 @@ def route_run_make_target(target):
     output = output.split('\n')
     return dict(output=output, errmsg=None)
 
+@bottle.route('/favicon.ico')
+def serve_favicon():
+    print 'ou'
+    return bottle.static_file('favicon.ico', root='static/')
 
 # Admin-only pages
 
@@ -424,7 +428,6 @@ def delete_role():
 
 
 # end of admin-only pages
-
 
 
 def main():
@@ -517,7 +520,7 @@ def parse_args():
         action='append', default=[])
     ap.add_argument('--host', default='localhost')
     ap.add_argument('-D', '--debug', action='store_true')
-    ap.add_argument('directory', help="Pelican site directory")
+    ap.add_argument('directory', help="site directory")
     ap.add_argument('--no-auth', help="Disable authentication",
         action="store_true")
 

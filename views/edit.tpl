@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title>Pelican editor</title>
+        <title>Shoebill</title>
         <style>
             html, body {
                 height: 100%;
@@ -133,6 +133,9 @@
                 document.getElementById('newfileform').action = path + fname;
             }
         </script>
+
+
+        <link rel="shortcut icon" href="/favicon.ico" />
 
         <div id="buttons" class="leftcol">
             <form action="/make/publish" method="POST">
