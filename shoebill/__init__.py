@@ -37,15 +37,6 @@ try:
     from beaker.middleware import SessionMiddleware
     from cork import Cork
     aaa_available = True
-    session_opts = {
-        'session.cookie_expires': True,
-        'session.encrypt_key': 'REPLACEME',
-        'session.httponly': True,
-        'session.timeout': 3600 * 24,  # 1 day
-        'session.type': 'cookie',
-        'session.validate_key': True,
-    }
-    wrapped_app = SessionMiddleware(app, session_opts)
 except ImportError:  # pragma: nocover
     aaa_available = False
 
@@ -53,6 +44,10 @@ except ImportError:  # pragma: nocover
 git_repo = None
 content_path = None
 make_targets = None
+
+def gen_random_token(length):
+    """Generate a printable random string"""
+    return b64encode(os.urandom(length))
 
 class Path(object):
     """Represent a path to a file or directory in the site dir
@@ -453,6 +448,7 @@ def delete_role():
 
 def main():
     global aaa
+    global app
     global content_path
     global git_repo
 
@@ -489,12 +485,17 @@ def main():
         if not os.path.isdir(auth_dir):
             print "Creating authentication data"
             os.mkdir(auth_dir)
+
+            token = gen_random_token(21)
+            with open(os.path.join(auth_dir, 'token'), 'w') as f:
+                f.write(token)
+
             aaa = Cork(auth_dir, initialize=True)
             aaa._store.roles['admin'] = 100
             aaa._store.roles['editor'] = 50
             aaa._store.save_roles()
             tstamp = str(datetime.utcnow())
-            admin_password = b64encode(os.urandom(6))
+            admin_password = gen_random_token(6)
             aaa._store.users['admin'] = {
                 'role': 'admin',
                 'hash': aaa._hash('admin', admin_password),
@@ -508,25 +509,31 @@ def main():
             print "\n", "*" * 32, "\n"
             print "Initialized user 'admin' with password '%s'" % admin_password
             print "\n", "*" * 32, "\n"
-            token = b64encode(os.urandom(21))
-            with open(os.path.join(auth_dir, 'token'), 'w') as f:
-                f.write(token)
-
 
         else:
             aaa = Cork(auth_dir)
 
 
+    if aaa:
+        # Sessions are enabled only if authentication is enabled
+        with open(os.path.join(auth_dir, 'token')) as f:
+            session_encrypt_key = f.read()
 
-    try:
-        if aaa_available:
-            app = wrapped_app
+        session_opts = {
+            'session.cookie_expires': True,
+            'session.encrypt_key': session_encrypt_key,
+            'session.httponly': True,
+            'session.timeout': 3600 * 24,  # 1 day
+            'session.type': 'cookie',
+            'session.validate_key': True,
+        }
+        wrapped_app = SessionMiddleware(app, session_opts)
+        bottle.run(wrapped_app, host=args.host, port=args.port, debug=args.debug,
+            reloader=args.debug, server='auto')
 
+    else:
         bottle.run(app, host=args.host, port=args.port, debug=args.debug,
             reloader=args.debug, server='auto')
-    except Exception, e:
-        print "Unhandled exception: %s" % e
-        raise
 
 
 def parse_args():
