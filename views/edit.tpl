@@ -3,14 +3,19 @@
     <head>
         <title>Pelican editor</title>
         <style>
-            html, body, #layout { height: 100%; }
+            html, body {
+                height: 100%;
+                margin:0;
+                padding:0;
+                width: 100%;
+                position:fixed;
+            }
             html {
-                color: #555;
                 font-size: 90%;
+                position: relative;
             }
             body {
                 background-color: #fafafa;
-                padding: 0;
             }
             a {
                 color: black;
@@ -20,29 +25,31 @@
                 text-decoration: underline;
             }
 
-            .leftcol, .centercol, .rightcol {
-                display: inline-block;
+            .leftcol {
                 float: left;
+                width: 14em;
+                background: #923;
                 height: 100%;
-                overflow: hidden;
+            }
+            .centercol {
+                float: left;
+                width: 18em;
+                height: 100%;
             }
             .rightcol {
-                background: #f0f0f0;
-                width: auto;
-                float: right;
+                margin-left: 35em;
+                height: 100%;
+                padding: 1em;
             }
 
             div#buttons {
-                width: 12em;
                 padding: .5em;
             }
             div#buttons form  {
                 text-align: center;
             }
-
             div#fsbox {
-                width: 18em;
-                padding: .5em;
+                padding: .5em 1em;
             }
             div#fsbox div {
                 padding: 1%;
@@ -65,6 +72,7 @@
             div#editform textarea {
                 width: 100%;
                 min-height: 30em;
+                box-sizing:border-box;
             }
 
             span#savemsg {
@@ -107,6 +115,11 @@
                 background: -webkit-gradient(linear, left top, left bottom, from(#f88e11), to(#f06015));
                 background: -moz-linear-gradient(top,  #f88e11,  #f06015);
             }
+            .centercol {
+                -moz-box-shadow:    inset 0 -10px 10px #999;
+                -webkit-box-shadow: inset 0 -10px 10px #999;
+                box-shadow:         inset 0 -10px 10px #999;
+             }
 
         </style>
 
@@ -120,7 +133,7 @@
                 document.getElementById('newfileform').action = path + fname;
             }
         </script>
-    <div id="layout">
+
         <div id="buttons" class="leftcol">
             <form action="/make/publish" method="POST">
                 <input type="submit" class="button" value="Rebuild">
@@ -192,6 +205,6 @@
             </form>
         % end
         </div>
-    </div>
+
     </body>
 </html>
