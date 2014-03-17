@@ -156,7 +156,7 @@
             </form>
             % if aaa_enabled:
             <div id="pwchange">
-                <a href="change_password">Change password</a>
+                <a href="/change_password">Change password</a>
             </div>
             % end
         </div>
