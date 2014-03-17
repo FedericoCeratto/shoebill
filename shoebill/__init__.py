@@ -445,19 +445,7 @@ def delete_role():
 
 # end of admin-only pages
 
-
-def main():
-    global aaa
-    global app
-    global content_path
-    global git_repo
-
-    setproctitle('shoebill')
-
-    args = parse_args()
-
-    site_path = os.path.abspath(args.directory)
-    content_path = os.path.join(site_path, 'content')
+def check_site_dir(site_path, content_path):
 
     if not os.path.isdir(site_path):
         print "%s does not exists or is not a directory" % site_path
@@ -467,12 +455,32 @@ def main():
         print "The content directory %s is missing" % content_path
         sys.exit(1)
 
-    print "Starting Shoebill..."
+    makefile = os.path.join(site_path, 'Makefile')
+    if not os.path.isfile(makefile):
+        print "WARNING: missing Makefile at %s" % makefile
 
+def setup_git_repo(site_path):
+    global git_repo
     try:
         git_repo = Repo(site_path)
     except InvalidGitRepositoryError:
         print "%s is not a valid Git repository" % site_path
+
+def main():
+    global aaa
+    global app
+    global content_path
+
+    setproctitle('shoebill')
+
+    args = parse_args()
+
+    site_path = os.path.abspath(args.directory)
+    content_path = os.path.join(site_path, 'content')
+    check_site_dir(site_path, content_path)
+
+    print "Starting Shoebill..."
+    setup_git_repo(site_path)
 
     if not args.no_auth:
         # Setup authentication
