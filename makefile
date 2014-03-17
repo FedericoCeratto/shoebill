@@ -1,7 +1,7 @@
 # vim: set noexpandtab:
 
 PROJ = shoebill
-VERSION=$(python setup.py --version)
+VERSION=$(shell python setup.py --version)
 
 # Default unit testing globbing
 TESTGLOB = test*.py
@@ -57,4 +57,29 @@ cover-functional-loop:
 
 cover-loop:
 	while true;do inotifywait */*.py;nosetests tests/test*.py --with-coverage --cover-package=$(PROJ) --cover-erase;sleep 1;done
+
+# target: tox - run tox
+tox:
+	tox
+
+# target: release-check - check if the current version has already been released
+release-check:
+	! git tag | grep -q -x "$(VERSION)"
+
+# target: release - release on Pypi and Github
+release: release-check build coverage doc tox
+	test -f MANIFEST.in
+	echo "Releasing $(PROJ) version $(VERSION)"
+	git tag $(VERSION)
+	python setup.py sdist upload
+	git push --tags
+
+# target: test-pip-install - run Pip install from Pypi
+test-pip-install:
+	d=$(mktemp -d) && \
+	cd $d && \
+	virtualenv . && \
+	. bin/activate && \
+	pip install -v $(PROJ)
+
 
