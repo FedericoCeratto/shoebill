@@ -86,6 +86,8 @@ class TestWebapp(PelicanDirSetup):
         self.webapp_teardown()
         self.patches_teardown()
 
+    # Fetching edit page
+
     def test_edit(self):
         assert self._app.get('/edit').status == '200 OK'
         assert self._app.get('/edit/').status == '200 OK'
@@ -101,6 +103,19 @@ class TestWebapp(PelicanDirSetup):
         assert 'Error: the directory you specified does not exists.' in r
         assert 'Rebuild' not in r
 
+    def test_edit_hidden_file(self):
+        r = self._app.get('/edit/.hidden.rst')
+        assert r.status == '200 OK', r.status
+        assert 'Error: the directory you specified does not exists.' in r
+
+    def test_edit_dir_without_slash(self):
+        r = self._app.get('/edit/pages')
+        assert r.status == '302 Found', r
+        assert r.location == 'http://localhost:80/edit/pages/'
+
+
+    # Writing to a file
+
     def test_write_existing_file(self):
         r = self._app.post('/edit/hi.rst',
             {'file_contents':'test_contents'})
@@ -109,6 +124,12 @@ class TestWebapp(PelicanDirSetup):
 
     def test_write_missing_dir(self):
         r = self._app.post('/edit/nothere/hi.rst',
+            {'file_contents':'test_contents'})
+        assert r.status == '200 OK', r.status
+        assert 'Error: the directory you specified does not exists.' in r
+
+    def test_write_hidden_file(self):
+        r = self._app.post('/edit/.hidden.rst',
             {'file_contents':'test_contents'})
         assert r.status == '200 OK', r.status
         assert 'Error: the directory you specified does not exists.' in r
@@ -158,4 +179,5 @@ class TestWebappWithGitRepo(PelicanDirSetup):
         assert shoebill.git_repo.git.add.called
         shoebill.git_repo.git.add.assert_called_once_with(
             "%s/content/hi.rst" % self._site_path)
+
 

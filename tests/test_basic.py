@@ -6,10 +6,15 @@ from mock import patch, Mock
 import os
 
 import shoebill
-from shoebill import Path
+from shoebill import Path, gen_random_token
 
 # Prevent Bottle from capturing exceptions
 shoebill.app.catchall = False
+
+def test_gen_token():
+    t = gen_random_token(6)
+    assert len(t) == 8, repr(t)
+    assert gen_random_token(6) != gen_random_token(6)
 
 class TestPathOnDir(object):
 
