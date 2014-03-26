@@ -4,7 +4,7 @@ shoebill
 
 Web-based editor for Pelican and Nikola
 
-
+[![Build Status](https://travis-ci.org/FedericoCeratto/shoebill.svg?branch=master)](https://travis-ci.org/FedericoCeratto/shoebill)
 
 Installation
 ------------
