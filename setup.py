@@ -4,7 +4,7 @@ from glob import glob
 from setuptools import setup
 import os.path
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 CLASSIFIERS = map(str.strip,
 """Environment :: Console
@@ -48,6 +48,7 @@ setup(
     long_description="Simple web-based Markdown editor for Pelican and Nikola,"
         "with authentication and Git support",
     classifiers=CLASSIFIERS,
+    keywords="pelican nikola static generator editor",
     install_requires=[
         'Beaker>=1.6.3',
         'Bottle>=0.10.11',
@@ -58,7 +59,11 @@ setup(
     packages=['shoebill'],
     data_files=data_files,
     platforms=['Linux'],
+    zip_safe=False,
     test_suite='nose.collector',
     tests_require=['nose'],
     entry_points=entry_points,
+
+    package_data = {'': ['*.tpl']},
+    include_package_data=True,
 )
