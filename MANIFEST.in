@@ -1,6 +1,7 @@
+# Used by setup.py sdist to include files in the source package
 include tests/*.py
 include setup.py
 include README.md
 include LICENSE
-include views/*.tpl
-include static/favicon.ico
+#include views/*.tpl
+#include static/favicon.ico

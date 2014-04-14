@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-from glob import glob
 from setuptools import setup
-import os.path
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 CLASSIFIERS = map(str.strip,
 """Environment :: Console
@@ -15,21 +13,6 @@ Programming Language :: Python
 Programming Language :: Python :: 2.7
 Topic :: Internet :: WWW/HTTP :: WSGI
 """.splitlines())
-
-data_files_globs = [
-    ['views', ['*.tpl']],
-    ['static', ['*.ico']],
-]
-
-
-data_files = []
-for dirname, globs in data_files_globs:
-    expanded_fnames = set()
-    for g in globs:
-        ffn = os.path.join(dirname, g)
-        expanded_fnames.update(glob(ffn))
-
-    data_files.append((dirname, sorted(expanded_fnames)))
 
 entry_points = {
     'console_scripts': [
@@ -57,13 +40,12 @@ setup(
         'setproctitle>=1.0.1',
     ],
     packages=['shoebill'],
-    data_files=data_files,
+    package_dir={'shoebill': 'shoebill'},
     platforms=['Linux'],
     zip_safe=False,
     test_suite='nose.collector',
     tests_require=['nose'],
     entry_points=entry_points,
-
-    package_data = {'': ['*.tpl']},
-    include_package_data=True,
+    # Used by setup.py bdist to include files in the binary package
+    package_data={'shoebill': ['views/*.tpl', 'static/*']},
 )

@@ -20,6 +20,7 @@
 from base64 import b64encode
 from datetime import datetime
 from git import Repo, InvalidGitRepositoryError
+from pkg_resources import resource_filename
 from setproctitle import setproctitle
 import argparse
 import bottle
@@ -32,6 +33,10 @@ log = logging.getLogger('shoebill')
 
 app = bottle.app()
 aaa = None
+
+tpl_path = resource_filename('shoebill', 'views')
+bottle.TEMPLATE_PATH.insert(0, tpl_path)
+static_path = resource_filename('shoebill', 'static')
 
 try:
     from beaker.middleware import SessionMiddleware
@@ -386,7 +391,7 @@ def route_run_make_target(target):
 
 @bottle.route('/favicon.ico')
 def serve_favicon():
-    return bottle.static_file('favicon.ico', root='static/')
+    return bottle.static_file('favicon.ico', root=static_path)
 
 # Admin-only pages
 
