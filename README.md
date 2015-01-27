@@ -9,6 +9,14 @@ Web-based editor for Pelican and Nikola
 [![Number of downloads](https://pypip.in/d/shoebill/badge.png)](https://pypi.python.org/pypi/shoebill)
 [![License](https://pypip.in/license/shoebill/badge.png)](https://pypi.python.org/pypi/shoebill)
 
+Features
+--------
+
+* Create and edit files
+* Commit file changes on Git (optional)
+* Run "make publish" and additional make targets
+* Authentication (optional)
+
 Installation
 ------------
 
