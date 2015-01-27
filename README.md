@@ -50,4 +50,7 @@ Optionally you can specify:
     --no-auth                      - Disable authentication
 
 
+Screenshots
+-----------
 
+![ScreenShot](https://raw.github.com/FedericoCeratto/shoebill/screenshots/screenshot1.jpg)
