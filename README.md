@@ -5,9 +5,9 @@ shoebill
 Web-based editor for Pelican and Nikola
 
 [![Build Status](https://travis-ci.org/FedericoCeratto/shoebill.svg?branch=master)](https://travis-ci.org/FedericoCeratto/shoebill)
-[![Latest release](https://pypip.in/v/shoebill/badge.png)](https://pypi.python.org/pypi/shoebill)
-[![Number of downloads](https://pypip.in/d/shoebill/badge.png)](https://pypi.python.org/pypi/shoebill)
-[![License](https://pypip.in/license/shoebill/badge.png)](https://pypi.python.org/pypi/shoebill)
+[![Latest release](https://img.shields.io/pypi/v/shoebill.svg?style=plastic)](https://pypi.python.org/pypi/shoebill)
+[![Number of downloads](https://img.shields.io/pypi/dm/shoebill.svg?style=plastic)](https://pypi.python.org/pypi/shoebill)
+[![License](http://img.shields.io/:license-gpl3-blue.svg?style=plastic)](https://pypi.python.org/pypi/shoebill)
 
 Features
 --------
