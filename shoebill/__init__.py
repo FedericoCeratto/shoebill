@@ -29,18 +29,19 @@ import os
 import subprocess
 import sys
 
-log = logging.getLogger('shoebill')
+log = logging.getLogger("shoebill")
 
 app = bottle.app()
 aaa = None
 
-tpl_path = resource_filename('shoebill', 'views')
+tpl_path = resource_filename("shoebill", "views")
 bottle.TEMPLATE_PATH.insert(0, tpl_path)
-static_path = resource_filename('shoebill', 'static')
+static_path = resource_filename("shoebill", "static")
 
 try:
     from beaker.middleware import SessionMiddleware
     from cork import Cork
+
     aaa_available = True
 except ImportError:  # pragma: nocover
     aaa_available = False
@@ -50,25 +51,27 @@ git_repo = None
 content_path = None
 make_targets = None
 
+
 def gen_random_token(length):
     """Generate a printable random string"""
     return b64encode(os.urandom(length))
 
+
 class Path(object):
-    """Represent a path to a file or directory in the site dir
-    """
+    """Represent a path to a file or directory in the site dir"""
+
     def __init__(self, relurl=None, absfile=None):
         global content_path
         self._content_path = content_path
         self._ossep = os.sep
-        self._urlsep = '/'
-        #print "relurl %r" % relurl
-        #print "absfile %r" % absfile
+        self._urlsep = "/"
+        # print "relurl %r" % relurl
+        # print "absfile %r" % absfile
 
         if absfile:
             self._abspath = absfile
         else:
-            relurl = relurl.lstrip('/')  # Prevent directory traversal attacks
+            relurl = relurl.lstrip("/")  # Prevent directory traversal attacks
             relpath = self._ossep.join(relurl.split(self._urlsep))
             self._abspath = os.path.join(self._content_path, relpath)
 
@@ -133,7 +136,7 @@ class Path(object):
         :returns: bool
         """
         for c in self.url_chunks():
-            if c.startswith('.'):
+            if c.startswith("."):
                 return True
 
         return False
@@ -171,12 +174,10 @@ class Path(object):
         bdn = os.path.dirname(self._abspath)
         w = os.walk(bdn)
         _, dirnames, filenames = next(w)
-        dirnames = [Path(absfile=os.path.join(bdn, d) + '/')
-            for d in sorted(dirnames)]
+        dirnames = [Path(absfile=os.path.join(bdn, d) + "/") for d in sorted(dirnames)]
         dirnames = [d for d in dirnames if not d.is_hidden]
 
-        filenames = [Path(absfile=os.path.join(bdn, f))
-            for f in sorted(filenames)]
+        filenames = [Path(absfile=os.path.join(bdn, f)) for f in sorted(filenames)]
         filenames = [f for f in filenames if not f.is_hidden]
 
         return dirnames, filenames
@@ -194,80 +195,88 @@ class Path(object):
 
 ## Webapp methods ##
 
+
 def post_get(name):
     return bottle.request.forms[name].strip()
 
+
 def error(msg):
-    """Generate an error page
-    """
-    return bottle.template('msgbox', output=[], errmsg=msg)
+    """Generate an error page"""
+    return bottle.template("msgbox", output=[], errmsg=msg)
+
 
 def msg(text):
-    """Generate a message page
-    """
-    return bottle.template('msgbox', output=text.split('\n'), errmsg='')
+    """Generate a message page"""
+    return bottle.template("msgbox", output=text.split("\n"), errmsg="")
+
 
 path_not_found = error("Error: the directory you specified does not exists.")
 
 
-@bottle.route('/')
+@bottle.route("/")
 def route_index():
-    return bottle.redirect('/edit')
+    return bottle.redirect("/edit")
 
-@bottle.route('/login')
-@bottle.view('login_form')
+
+@bottle.route("/login")
+@bottle.view("login_form")
 def route_login_form():
     """Serve login form"""
     pass
 
-@bottle.post('/login')
+
+@bottle.post("/login")
 def login():
     """Authenticate users"""
     if not aaa:
-        return bottle.redirect('/edit')
+        return bottle.redirect("/edit")
 
-    username = post_get('username')
-    password = post_get('password')
-    aaa.login(username, password, success_redirect='/edit', fail_redirect='/login')
+    username = post_get("username")
+    password = post_get("password")
+    aaa.login(username, password, success_redirect="/edit", fail_redirect="/login")
 
-@bottle.route('/logout')
+
+@bottle.route("/logout")
 def logout():
     """Log out"""
     if aaa:
-        aaa.logout(success_redirect='/login')
+        aaa.logout(success_redirect="/login")
 
-    return bottle.redirect('/edit')
+    return bottle.redirect("/edit")
 
-@bottle.route('/change_password')
-@bottle.view('password_change_form')
+
+@bottle.route("/change_password")
+@bottle.view("password_change_form")
 def route_password_change_form():
     """Serve password change form"""
     if not aaa:
-        return bottle.redirect('/edit')
+        return bottle.redirect("/edit")
 
-@bottle.post('/change_password')
+
+@bottle.post("/change_password")
 def route_change_password():
     """Change password"""
     if not aaa:
-        return bottle.redirect('/edit')
+        return bottle.redirect("/edit")
 
-    aaa.require(fail_redirect='/login')
-    password = post_get('password')
+    aaa.require(fail_redirect="/login")
+    password = post_get("password")
     aaa.current_user.update(pwd=password)
 
-    return msg('Password updated.')
+    return msg("Password updated.")
 
-@bottle.route('/edit')
-@bottle.route('/edit/')
-@bottle.route('/edit/<path:path>')
-@bottle.view('edit')
-def route_edit(path='', savemsg=None):
+
+@bottle.route("/edit")
+@bottle.route("/edit/")
+@bottle.route("/edit/<path:path>")
+@bottle.view("edit")
+def route_edit(path="", savemsg=None):
     """Serve the main UI page, displaying files and directories and,
     optionally, a form to edit the current file. Also, display buttons
     to execute makefile targets
     """
     if aaa:
-        aaa.require(fail_redirect='/login')
+        aaa.require(fail_redirect="/login")
 
     path = path.strip()
     path = Path(relurl=path)
@@ -286,27 +295,31 @@ def route_edit(path='', savemsg=None):
 
     if not path.is_dir and path.is_real_dir:
         # path ends without '/' but there is a directory with that name
-        return bottle.redirect(path.as_url + '/')
+        return bottle.redirect(path.as_url + "/")
 
-    contents = ''
+    contents = ""
     if path.is_real_file and not path.is_dir:
         with open(path.as_abs_path) as f:
             contents = f.read()
 
-    d = dict(path=path, contents=contents, savemsg=savemsg,
-        git_enabled=bool(git_repo), make_targets=make_targets,
+    d = dict(
+        path=path,
+        contents=contents,
+        savemsg=savemsg,
+        git_enabled=bool(git_repo),
+        make_targets=make_targets,
         aaa_enabled=bool(aaa),
     )
     return d
 
 
-@bottle.post('/edit/<path:path>')
+@bottle.post("/edit/<path:path>")
 def route_post_save(path):
     """Save changes to a file (or create new file)
     Commits on Git if a repository exists.
     """
     if aaa:
-        aaa.require(fail_redirect='/login')
+        aaa.require(fail_redirect="/login")
 
     path = path.strip()
     path = Path(relurl=path)
@@ -324,229 +337,245 @@ def route_post_save(path):
 
     already_existing = path.is_real_file
 
-    print 'writing', path.as_abs_path
+    print("writing %s", path.as_abs_path)
     file_contents = bottle.request.forms.file_contents
-    with open(path.as_abs_path, 'w') as f:
+    with open(path.as_abs_path, "w") as f:
         f.write(file_contents)
 
     if not git_repo:
-        return route_edit(path=path.as_url, savemsg='Saved.')
+        return route_edit(path=path.as_url, savemsg="Saved.")
 
     repo_is_dirty = git_repo.is_dirty()
     git_repo.git.add(path.as_abs_path)
     repo_is_dirty = repo_is_dirty or git_repo.is_dirty()
 
     if already_existing and not repo_is_dirty:
-        return route_edit(path=path.as_url, savemsg='No changes to be saved!')
+        return route_edit(path=path.as_url, savemsg="No changes to be saved!")
 
-    description = post_get('desc') or \
-        "Update %s" % path.as_abs_path
+    description = post_get("desc") or "Update %s" % path.as_abs_path
 
     if aaa:
         cu = aaa.current_user
-        email_addr = cu.email_addr or ''
+        email_addr = cu.email_addr or ""
         author = "%s <%s>" % (cu.username, email_addr)
         git_repo.git.commit(m=description, author=author)
 
     else:
         git_repo.git.commit(m=description)
 
-    return route_edit(path=path.as_url, savemsg='Saved.')
+    return route_edit(path=path.as_url, savemsg="Saved.")
 
-@bottle.route('/make')
-@bottle.route('/make/')
-@bottle.route('/make/<target>')
+
+@bottle.route("/make")
+@bottle.route("/make/")
+@bottle.route("/make/<target>")
 def route_get_make_target(target=None):
-    """Redirect GETs on /make to /edit
-    """
+    """Redirect GETs on /make to /edit"""
     if aaa:
-        aaa.require(fail_redirect='/login')
+        aaa.require(fail_redirect="/login")
 
-    raise bottle.redirect('/edit/')
+    raise bottle.redirect("/edit/")
 
-@bottle.post('/make/<target>')
-@bottle.view('msgbox')
+
+@bottle.post("/make/<target>")
+@bottle.view("msgbox")
 def route_run_make_target(target):
-    """Execute make target, serve output page
-    """
+    """Execute make target, serve output page"""
     global content_path
     global make_targets
 
     if aaa:
-        aaa.require(fail_redirect='/login')
+        aaa.require(fail_redirect="/login")
 
     target = target.strip()
-    print "Running target: %r" % target
+    print("Running target: %r" % target)
 
-    if target != 'publish'and target not in make_targets:
+    if target != "publish" and target not in make_targets:
         return error("Unknown make target")
 
     site_path = os.path.dirname(content_path)
 
-    cmd = subprocess.Popen(['make', target], cwd=site_path,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    cmd = subprocess.Popen(
+        ["make", target],
+        cwd=site_path,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
     output = cmd.communicate()[0]
-    output = output.split('\n')
+    output = output.split("\n")
     return dict(output=output, errmsg=None)
 
-@bottle.route('/favicon.ico')
+
+@bottle.route("/favicon.ico")
 def serve_favicon():
-    return bottle.static_file('favicon.ico', root=static_path)
+    return bottle.static_file("favicon.ico", root=static_path)
+
 
 # Admin-only pages
 
-@bottle.route('/admin')
-@bottle.route('/admin/')
-@bottle.view('admin_page')
+
+@bottle.route("/admin")
+@bottle.route("/admin/")
+@bottle.view("admin_page")
 def admin():
     """Only admin users can see this"""
-    #aaa.require(role='admin', fail_redirect='/')
+    # aaa.require(role='admin', fail_redirect='/')
     return dict(
-        current_user=aaa.current_user,
-        users=aaa.list_users(),
-        roles=aaa.list_roles()
+        current_user=aaa.current_user, users=aaa.list_users(), roles=aaa.list_roles()
     )
 
 
-@bottle.post('/create_user')
+@bottle.post("/create_user")
 def create_user():
     try:
-        aaa.create_user(
-            post_get('username'),
-            post_get('role'),
-            post_get('password')
-        )
-        return msg('User created')
-    except Exception, e:
+        aaa.create_user(post_get("username"), post_get("role"), post_get("password"))
+        return msg("User created")
+    except Exception as e:
         return error(msg=e.message)
 
 
-@bottle.post('/delete_user')
+@bottle.post("/delete_user")
 def delete_user():
     try:
-        aaa.delete_user(post_get('username'))
-        return msg('User deleted')
-    except Exception, e:
+        aaa.delete_user(post_get("username"))
+        return msg("User deleted")
+    except Exception as e:
         return error(msg=e.message)
 
 
-@bottle.post('/create_role')
+@bottle.post("/create_role")
 def create_role():
     try:
-        aaa.create_role(post_get('role'), post_get('level'))
-        return msg('Role created')
-    except Exception, e:
+        aaa.create_role(post_get("role"), post_get("level"))
+        return msg("Role created")
+    except Exception as e:
         return error(msg=e.message)
 
 
-@bottle.post('/delete_role')
+@bottle.post("/delete_role")
 def delete_role():
     try:
-        aaa.delete_role(post_get('role'))
-        return msg('Role deleted')
-    except Exception, e:
+        aaa.delete_role(post_get("role"))
+        return msg("Role deleted")
+    except Exception as e:
         return error(msg=e.message)
 
 
 # end of admin-only pages
 
+
 def check_site_dir(site_path, content_path):
 
     if not os.path.isdir(site_path):
-        print "%s does not exists or is not a directory" % site_path
+        print("%s does not exists or is not a directory" % site_path)
         sys.exit(1)
 
     if not os.path.isdir(content_path):
-        print "The content directory %s is missing" % content_path
+        print("The content directory %s is missing" % content_path)
         sys.exit(1)
 
-    makefile = os.path.join(site_path, 'Makefile')
+    makefile = os.path.join(site_path, "Makefile")
     if not os.path.isfile(makefile):
-        print "WARNING: missing Makefile at %s" % makefile
+        print("WARNING: missing Makefile at %s" % makefile)
+
 
 def setup_git_repo(site_path):
     global git_repo
     try:
         git_repo = Repo(site_path)
     except InvalidGitRepositoryError:
-        print "%s is not a valid Git repository" % site_path
+        print("%s is not a valid Git repository" % site_path)
+
 
 def main():
     global aaa
     global app
     global content_path
 
-    setproctitle('shoebill')
+    setproctitle("shoebill")
 
     args = parse_args()
 
     site_path = os.path.abspath(args.directory)
-    content_path = os.path.join(site_path, 'content')
+    content_path = os.path.join(site_path, "content")
     check_site_dir(site_path, content_path)
 
-    print "Starting Shoebill..."
+    print("Starting Shoebill...")
     setup_git_repo(site_path)
 
     if not args.no_auth:
         # Setup authentication
         if not aaa_available:
-            print """Error: the Beaker and/or Cork libraries are missing. \
+            print(
+                """Error: the Beaker and/or Cork libraries are missing. \
             \nPlease install them or disable authentication using --no-auth"""
+            )
             sys.exit(1)
 
-        auth_dir = os.path.join(site_path, '.shoebill_auth')
+        auth_dir = os.path.join(site_path, ".shoebill_auth")
         if not os.path.isdir(auth_dir):
-            print "Creating authentication data"
+            print("Creating authentication data")
             os.mkdir(auth_dir)
 
             token = gen_random_token(21)
-            with open(os.path.join(auth_dir, 'token'), 'w') as f:
+            with open(os.path.join(auth_dir, "token"), "w") as f:
                 f.write(token)
 
             aaa = Cork(auth_dir, initialize=True)
-            aaa._store.roles['admin'] = 100
-            aaa._store.roles['editor'] = 50
+            aaa._store.roles["admin"] = 100
+            aaa._store.roles["editor"] = 50
             aaa._store.save_roles()
             tstamp = str(datetime.utcnow())
             admin_password = gen_random_token(6)
-            aaa._store.users['admin'] = {
-                'role': 'admin',
-                'hash': aaa._hash('admin', admin_password),
-                'email_addr': '',
-                'desc': 'admin',
-                'creation_date': tstamp,
-                '_accessed_time': tstamp,
-                'last_login': tstamp
+            aaa._store.users["admin"] = {
+                "role": "admin",
+                "hash": aaa._hash("admin", admin_password),
+                "email_addr": "",
+                "desc": "admin",
+                "creation_date": tstamp,
+                "_accessed_time": tstamp,
+                "last_login": tstamp,
             }
             aaa._store.save_users()
-            print "\n", "*" * 32, "\n"
-            print "Initialized user 'admin' with password '%s'" % admin_password
-            print "\n", "*" * 32, "\n"
+            print("\n", "*" * 32, "\n")
+            print("Initialized user 'admin' with password '%s'" % admin_password)
+            print("\n", "*" * 32, "\n")
 
         else:
             aaa = Cork(auth_dir)
 
-
     if aaa:
         # Sessions are enabled only if authentication is enabled
-        with open(os.path.join(auth_dir, 'token')) as f:
+        with open(os.path.join(auth_dir, "token")) as f:
             session_encrypt_key = f.read()
 
         session_opts = {
-            'session.cookie_expires': True,
-            'session.encrypt_key': session_encrypt_key,
-            'session.httponly': True,
-            'session.timeout': 3600 * 24,  # 1 day
-            'session.type': 'cookie',
-            'session.validate_key': True,
+            "session.cookie_expires": True,
+            "session.encrypt_key": session_encrypt_key,
+            "session.httponly": True,
+            "session.timeout": 3600 * 24,  # 1 day
+            "session.type": "cookie",
+            "session.validate_key": True,
         }
         wrapped_app = SessionMiddleware(app, session_opts)
-        bottle.run(wrapped_app, host=args.host, port=args.port, debug=args.debug,
-            reloader=args.debug, server='auto')
+        bottle.run(
+            wrapped_app,
+            host=args.host,
+            port=args.port,
+            debug=args.debug,
+            reloader=args.debug,
+            server="auto",
+        )
 
     else:
-        bottle.run(app, host=args.host, port=args.port, debug=args.debug,
-            reloader=args.debug, server='auto')
+        bottle.run(
+            app,
+            host=args.host,
+            port=args.port,
+            debug=args.debug,
+            reloader=args.debug,
+            server="auto",
+        )
 
 
 def parse_args():
@@ -556,18 +585,23 @@ def parse_args():
     """
     global make_targets
     ap = argparse.ArgumentParser()
-    ap.add_argument('-p', '--port', default=8080, help="Port (default: 8080)")
-    ap.add_argument('-t', '--target', help="Enable an additional make target",
-        action='append', default=[])
-    ap.add_argument('--host', default='localhost')
-    ap.add_argument('-D', '--debug', action='store_true')
-    ap.add_argument('directory', help="site directory")
-    ap.add_argument('--no-auth', help="Disable authentication",
-        action="store_true")
+    ap.add_argument("-p", "--port", default=8080, help="Port (default: 8080)")
+    ap.add_argument(
+        "-t",
+        "--target",
+        help="Enable an additional make target",
+        action="append",
+        default=[],
+    )
+    ap.add_argument("--host", default="localhost")
+    ap.add_argument("-D", "--debug", action="store_true")
+    ap.add_argument("directory", help="site directory")
+    ap.add_argument("--no-auth", help="Disable authentication", action="store_true")
 
     args = ap.parse_args()
     make_targets = args.target
     return args
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
