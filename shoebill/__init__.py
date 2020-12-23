@@ -52,9 +52,9 @@ content_path = None
 make_targets = None
 
 
-def gen_random_token(length):
+def gen_random_token(length) -> str:
     """Generate a printable random string"""
-    return b64encode(os.urandom(length))
+    return b64encode(os.urandom(length)).decode()
 
 
 class Path(object):
@@ -81,7 +81,7 @@ class Path(object):
             assert not self.as_url.endswith(self._urlsep), "%r" % self.as_url
 
     @property
-    def is_dir(self):
+    def is_dir(self) -> bool:
         """Check if the current path is meant to be a directory
         (ends with a slash)
 
@@ -402,7 +402,7 @@ def route_run_make_target(target):
         stderr=subprocess.STDOUT,
     )
     output = cmd.communicate()[0]
-    output = output.split("\n")
+    output = output.decode().split("\n")
     return dict(output=output, errmsg=None)
 
 
@@ -521,7 +521,7 @@ def main():
             with open(os.path.join(auth_dir, "token"), "w") as f:
                 f.write(token)
 
-            aaa = Cork(auth_dir, initialize=True)
+            aaa = Cork(auth_dir, initialize=True, preferred_hashing_algorithm="scrypt")
             aaa._store.roles["admin"] = 100
             aaa._store.roles["editor"] = 50
             aaa._store.save_roles()
@@ -542,7 +542,7 @@ def main():
             print("\n", "*" * 32, "\n")
 
         else:
-            aaa = Cork(auth_dir)
+            aaa = Cork(auth_dir, preferred_hashing_algorithm="scrypt")
 
     if aaa:
         # Sessions are enabled only if authentication is enabled
