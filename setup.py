@@ -2,23 +2,24 @@
 
 from setuptools import setup
 
-__version__ = '0.1.2'
+__version__ = "0.2.0"
 
-CLASSIFIERS = map(str.strip,
-"""Environment :: Console
+CLASSIFIERS = map(
+    str.strip,
+    """Environment :: Console
 License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Natural Language :: English
 Operating System :: POSIX :: Linux
 Programming Language :: Python
-Programming Language :: Python :: 2.7
+Programming Language :: Python :: 3.6
+Programming Language :: Python :: 3.7
+Programming Language :: Python :: 3.8
+Programming Language :: Python :: 3.9
 Topic :: Internet :: WWW/HTTP :: WSGI
-""".splitlines())
+""".splitlines(),
+)
 
-entry_points = {
-    'console_scripts': [
-        'shoebill = shoebill:main',
-    ]
-}
+entry_points = {"console_scripts": ["shoebill = shoebill:main"]}
 
 setup(
     name="shoebill",
@@ -29,23 +30,23 @@ setup(
     license="GPLv3+",
     url="https://github.com/FedericoCeratto/shoebill",
     long_description="Simple web-based Markdown editor for Pelican and Nikola,"
-        "with authentication and Git support",
+    "with authentication and Git support",
     classifiers=CLASSIFIERS,
     keywords="pelican nikola static generator editor",
     install_requires=[
-        'Beaker>=1.6.3',
-        'Bottle>=0.10.11',
-        'GitPython>=0.1.7',
-        'bottle-cork',
-        'setproctitle>=1.0.1',
+        "Beaker>=1.6.3",
+        "Bottle>=0.10.11",
+        "GitPython>=0.1.7",
+        "bottle-cork",
+        "setproctitle>=1.0.1",
     ],
-    packages=['shoebill'],
-    package_dir={'shoebill': 'shoebill'},
-    platforms=['Linux'],
+    packages=["shoebill"],
+    package_dir={"shoebill": "shoebill"},
+    platforms=["Linux"],
     zip_safe=False,
-    test_suite='nose.collector',
-    tests_require=['nose'],
+    test_suite="nose.collector",
+    tests_require=["nose"],
     entry_points=entry_points,
     # Used by setup.py bdist to include files in the binary package
-    package_data={'shoebill': ['views/*.tpl', 'static/*']},
+    package_data={"shoebill": ["views/*.tpl", "static/*"]},
 )
